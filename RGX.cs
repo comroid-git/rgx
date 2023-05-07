@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using CommandLine;
 using comroid.common;
@@ -85,18 +81,20 @@ public static class RGX
     private class Arg
     {
         [Value(0, MetaName = "pattern", Required = true)]
-        public string pattern { get; set; } = null!;
+        public string pattern { get; } = null!;
 
         [Value(1, MetaName = "replacement", Required = false, Default = null)]
-        public string? replacement { get; set; }
-        [Value(1)]
-        public IEnumerable<string> excess { get; set; }
+        public string? replacement { get; }
 
-        [Option(shortName: 'o', longName: "options", Separator = ',', Required = false)]
-        public IEnumerable<RegexOptions> options { get; set; } = null!;
-        [Option(shortName: 's', longName: "split", Required = false, Default = false)]
-        public bool split { get; set; }
-        [Option(shortName: 'f', longName: "file", Required = false, Default = null)]
-        public string? fileOutput { get; set; }
+        [Value(1)] public IEnumerable<string> excess { get; }
+
+        [Option('o', "options", Separator = ',', Required = false)]
+        public IEnumerable<RegexOptions> options { get; } = null!;
+
+        [Option('s', "split", Required = false, Default = false)]
+        public bool split { get; }
+
+        [Option('f', "file", Required = false, Default = null)]
+        public string? fileOutput { get; }
     }
 }
