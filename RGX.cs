@@ -1,19 +1,11 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using CommandLine;
-using comroid.common;
 
 namespace rgx;
 
 public static class RGX
 {
-    private static readonly ILog log = new Log("rgx");
-
-    static RGX()
-    {
-        ILog.Detail = DetailLevel.None;
-    }
-
     public static void Main(string[] args)
     {
         new Parser(cfg =>
@@ -96,6 +88,6 @@ public static class RGX
     private static void Error(IEnumerable<Error> errors)
     {
         foreach (var err in errors)
-            log.At(err.StopsProcessing ? LogLevel.Fatal : LogLevel.Error, err);
+            Console.Error.WriteLine(err);
     }
 }
