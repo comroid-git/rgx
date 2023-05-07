@@ -6,4 +6,3 @@ mkdir .build
 cd build
 makepkg -Cf --noconfirm
 cd ..
-rm -r .build
