@@ -15,16 +15,16 @@
         <LibCommonPath>..\csapi\common\common.csproj</LibCommonPath>
     </PropertyGroup>
 
-    <ItemGroup Condition="Exists('$(LibCommon)')">
-        <ProjectReference Include="$(LibCommon)"/>
+    <ItemGroup Condition="Exists('$(LibCommonPath)')">
+        <ProjectReference Include="$(LibCommonPath)" />
     </ItemGroup>
 
-    <ItemGroup Condition="!Exists('$(LibCommon)')">
-        <PackageReference Include="comroid.csapi.common" Version="0.1.0"/>
+    <ItemGroup Condition="!Exists('$(LibCommonPath)')">
+        <PackageReference Include="comroid.csapi.common" Version="0.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommandLineParser" Version="2.9.1"/>
+        <PackageReference Include="CommandLineParser" Version="2.9.1" />
     </ItemGroup>
 
 </Project>
