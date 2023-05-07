@@ -2,6 +2,9 @@
 
 set -e # exit on error
 
+# run tests first
+dotnet test
+
 # update SRCINFO
 git clean -f
 git reset --hard
