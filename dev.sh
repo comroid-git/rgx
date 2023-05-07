@@ -3,6 +3,6 @@
 set -e
 
 ./clean.sh
-./build.sh || echo "Build failed" >&2
+dotnet publish -c Release --use-current-runtime || echo "Build failed" >&2
 ./exec.sh || echo "Execute failed" >&2
 ./clean.sh

@@ -13,9 +13,8 @@ git reset --hard
 makepkg --printsrcinfo > .SRCINFO
 (git add .SRCINFO && git commit -m "SRCINFO" && git push) || true
 
-# verify that makepkg works
-# this also builds the executable
-./build.sh
+# build the executable
+makepkg -Cf --noconfirm
 
 # push to aur
 if [ -z "$(git remote | grep aur)" ]; then
