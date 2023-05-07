@@ -2,5 +2,5 @@
 
 mkdir .build || true
 cd .build || return
-makepkg -Cf --noconfirm
+makepkg -Cf --noconfirm -p ../PKGBUILD
 cd ..
