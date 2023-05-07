@@ -2,14 +2,12 @@
 
 set -e # exit on error
 
-./cleanup.sh
+./clean.sh
 
 # run tests first
 dotnet test
 
 # update SRCINFO
-git clean -f
-git reset --hard
 makepkg --printsrcinfo > .SRCINFO
 (git add .SRCINFO && git commit -m "SRCINFO" && git push) || true
 
