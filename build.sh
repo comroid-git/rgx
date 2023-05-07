@@ -1,8 +1,6 @@
 #!/usr/bin/bash
 
-set -e
-
-mkdir .build
-cd build
+mkdir .build || true
+cd .build || return
 makepkg -Cf --noconfirm
 cd ..
