@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 
-sudo rm -r */
+rm -rf */
 rm *.tar*
