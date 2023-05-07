@@ -2,6 +2,8 @@
 
 set -e # exit on error
 
+./cleanup.sh
+
 # run tests first
 dotnet test
 
