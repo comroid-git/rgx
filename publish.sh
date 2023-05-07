@@ -2,10 +2,6 @@
 
 set -e # exit on error
 
-# make prebuilt executable
-dotnet clean
-dotnet publish -c Release --use-current-runtime
-
 # update SRCINFO
 git clean -f
 git reset --hard
@@ -13,6 +9,7 @@ makepkg --printsrcinfo > .SRCINFO
 (git add .SRCINFO && git commit -m "SRCINFO" && git push) || true
 
 # verify that makepkg works
+# this also builds the executable
 makepkg -Cc --noconfirm
 
 # push to aur
