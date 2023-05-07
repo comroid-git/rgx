@@ -10,7 +10,7 @@ makepkg --printsrcinfo > .SRCINFO
 
 # verify that makepkg works
 # this also builds the executable
-makepkg -Cc --noconfirm
+makepkg -C --noconfirm
 
 # push to aur
 if [ -z "$(git remote | grep aur)" ]; then
