@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 
-rm -rf */
-rm *.tar*
+rm -rf */ || true
+rm *.tar* || true
