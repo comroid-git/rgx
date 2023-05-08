@@ -41,18 +41,40 @@ internal class Split : ICmd
     public string? input { get; set; }
     public string? output { get; set; }
 
-    [Option('m', "mode", Required = false, Default = OutputMode.Join, HelpText = "What to do with the inputs during output", MetaValue = "Prepend, Join or Append")]
+    [Option('m', "mode", Required = false, Default = OutputMode.Skip, HelpText = "What to do with unmatched inputs during output (default: Skip)", MetaValue = "Prepend, Skip or Append")]
     public OutputMode mode { get; set; }
 
     public enum OutputMode
     {
+        
+        Skip = default,
+        S = default,
+        
         Prepend = 1,
         P = 1,
         
-        Join = 2,
-        J = 2,
+        Append = 2,
+        A = 2
+    }
+}
+
+// effectively grep using defaults
+[Verb("-C", HelpText = "Cut matches out and write results to output")]
+internal class Cut : ICmd
+{
+    public string pattern { get; set; }
+    public IEnumerable<RegexOptions> flags { get; set; }
+    public string? input { get; set; }
+    public string? output { get; set; }
+    [Option('m', "mode", Required = false, Default = OutputMode.Extract, HelpText = "What to print", MetaValue = "")]
+    public OutputMode mode { get; set; }
+    public enum OutputMode
+    {
+        Extract = default,
+        E = default,
         
-        Append = 3,
-        A = 3
+        Remaining = 1,
+        Rem = 1,
+        R = 1
     }
 }
