@@ -34,6 +34,9 @@ internal interface ICmd
 
     [Option('T', "untreated", Required = false, Default = IncludeMode.Skip, HelpText = "What to do with untreated but matched inputs during output (default: Skip)", MetaValue = MetaIncludeMode)]
     public IncludeMode untreated { get; set; }
+    
+    [Option('a', "invert", Required = false, Default = false, HelpText = "When set, instead of writing all occurrences of pattern; writes the remainder after cutting all occurrences")]
+    public bool invert { get; set; }
 }
 
 [Verb("match", true, new[] { "-M", "m" }, HelpText = "Match or Replace input using RegExp and write results to output")]
@@ -45,6 +48,7 @@ internal class MatchCmd : ICmd
     public string? output { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
+    public bool invert { get; set; }
 }
 
 [Verb("expand", false, new[] { "-E", "e" }, HelpText = "Expand input using RegExp and write results to output")]
@@ -59,6 +63,7 @@ internal class ExpandCmd : ICmd
     public string? output { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
+    public bool invert { get; set; }
 }
 
 [Verb("split", false, new[] { "-S", "s" }, HelpText = "Split input using RegExp and write results to output")]
@@ -70,18 +75,17 @@ internal class SplitCmd : ICmd
     public string? output { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
+    public bool invert { get; set; }
 } // effectively grep using defaults
 
 [Verb("cut", false, new[] { "-C", "c" }, HelpText = "Cut matches out and write results to output")]
 internal class CutCmd : ICmd
 {
-    [Option('a', "invert", Required = false, Default = false, HelpText = "When set, instead of writing all occurrences of pattern; writes the remainder after cutting all occurrences")]
-    public bool invert { get; set; }
-
     public string pattern { get; set; }
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
+    public bool invert { get; set; }
 }

@@ -39,7 +39,7 @@ public static class RGX
             .WithParsed(Run<MatchCmd>(Match))
             .WithParsed(Run<ExpandCmd>(Expand))
             .WithParsed(Run<SplitCmd>(Split))
-            .WithParsed(Run<CutCmd>(Cut))
+            .WithParsed(Run<CutCmd>(Cut, true))
             .WithNotParsed(Error);
     }
 
@@ -121,7 +121,7 @@ public static class RGX
             Streamable.Get(cmd.output).AsWriter());
     }
 
-    private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler) where CMD : ICmd
+    private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler, bool customInverse = false) where CMD : ICmd
     {
         return cmd =>
         {
@@ -130,10 +130,13 @@ public static class RGX
             while (input.ReadLine() is { } line)
             {
                 var match = pattern.Match(line);
-
-                if (!match.Success && cmd.unmatched == ICmd.IncludeMode.Prepend)
+                var success = match.Success;
+                if (cmd.invert && !customInverse)
+                    success = !success;
+                
+                if (!success && cmd.unmatched == ICmd.IncludeMode.Prepend)
                     output.WriteLine(line);
-                else if (match.Success)
+                else if (success)
                 {
                     if (cmd.untreated == ICmd.IncludeMode.Prepend)
                         output.WriteLine(line);
