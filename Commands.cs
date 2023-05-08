@@ -35,7 +35,7 @@ internal interface ICmd
     }
 }
 
-[Verb("-M", HelpText = "Match or Replace input using RegExp and write results to output")]
+[Verb("-M", true, HelpText = "Match or Replace input using RegExp and write results to output")]
 internal class MatchCmd : ICmd
 {
     public string pattern { get; set; }
