@@ -28,6 +28,8 @@ public static class RGX
 
     private static (Regex pattern, TextReader input, TextWriter output) Prepare(ICmd cmd)
     {
+        if (cmd.flags.Contains(RegexOptions.Multiline))
+            Console.Error.WriteLine("Warning: The multiline flag is not supported since we're only ever parsing line by line");
         return (new Regex(File.Exists(cmd.pattern) ? File.ReadAllText(cmd.pattern) : cmd.pattern, (RegexOptions)cmd.flags.Aggregate(0, (x, y) => x | (int)y)),
             cmd.input is not null and not ""
                 ? File.Exists(cmd.input)
