@@ -21,7 +21,7 @@ public static class Tests
         var @out = new StringWriter();
 
         Run(type, pattern, @in, @out);
-        return Regex.Split(@out.ToString(), "\r?\n");
+        return Regex.Split(@out.ToString(), "\r?\n").SkipLast(1).ToArray();
     }
 
     public static void Run(RunType type, string pattern, TextReader input, TextWriter output)
@@ -58,7 +58,7 @@ public static class Tests
 7 Sockets in /run/screens/S-kaleidox.";
         var result = Run(RunType.match, @"\s*(\d+)\.(yourprocess)\s+\((\w+)\)", input);
 
-        Assert.That(result.Length, Is.EqualTo(1 + 1));
+        Assert.That(result.Length, Is.EqualTo(1));
         Assert.That(result[0], Is.EqualTo(Regex.Split(input, "\r?\n")[3]));
     }
 
