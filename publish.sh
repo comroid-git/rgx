@@ -7,11 +7,11 @@ set -e # exit on error
 # run tests first
 dotnet test -c Test
 
+# build the executable
+makepkg -f --noconfirm
+
 # update SRCINFO
 makepkg --printsrcinfo > .SRCINFO
-
-# build the executable
-makepkg -Cf --noconfirm
 
 # push to aur
 if [ -z "$(git remote | grep aur)" ]; then
