@@ -5,6 +5,13 @@ namespace rgx;
 
 internal interface ICmd
 {
+    public enum IncludeMode
+    {
+        Skip = default,
+        Prepend = 1,
+        Append = 2
+    }
+
     public const string MetaFile = "<file>";
     public const string MetaStreamable = "<string> or <file>";
     public const string MetaRegexOpts = "(see: .NET RegexOptions)";
@@ -19,34 +26,36 @@ internal interface ICmd
     [Option('i', "input", Required = false, Default = null, HelpText = "An input source, uses stdin if unspecified", MetaValue = MetaStreamable)]
     public string? input { get; set; }
 
-    [Option('o', "output", Required = false, Default = null, HelpText = "An output target, uses stdout if unspecified", MetaValue = MetaFile)]
+    [Option('o', "output", Required = false, Default = null, HelpText = "An output target, uses stdout if unspecified", MetaValue = MetaStreamable)]
     public string? output { get; set; }
+
+    [Option('A', "start", Required = false, Default = null, HelpText = "A pattern that needs to match before the actual task may begin", MetaValue = MetaStreamable)]
+    public string? start { get; set; }
+
+    [Option('Z', "stop", Required = false, Default = null, HelpText = "A pattern that, when matches, exits the program", MetaValue = MetaStreamable)]
+    public string? stop { get; set; }
 
     [Option('M', "unmatched", Required = false, Default = IncludeMode.Skip, HelpText = "What to do with unmatched inputs during output (default: Skip)", MetaValue = MetaIncludeMode)]
     public IncludeMode unmatched { get; set; }
+
     [Option('T', "untreated", Required = false, Default = IncludeMode.Skip, HelpText = "What to do with untreated but matched inputs during output (default: Skip)", MetaValue = MetaIncludeMode)]
     public IncludeMode untreated { get; set; }
-
-    public enum IncludeMode
-    {
-        Skip = default,
-        Prepend = 1,
-        Append = 2
-    }
 }
 
-[Verb("-M", HelpText = "Match or Replace input using RegExp and write results to output")]
+[Verb("match", true, new[] { "-M", "m" }, HelpText = "Match or Replace input using RegExp and write results to output")]
 internal class MatchCmd : ICmd
 {
     public string pattern { get; set; }
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
 }
 
-[Verb("-E", HelpText = "Expand input using RegExp and write results to output")]
+[Verb("expand", false, new[] { "-E", "e" }, HelpText = "Expand input using RegExp and write results to output")]
 internal class ExpandCmd : ICmd
 {
     [Value(1, Required = true, MetaName = "expander", HelpText = "Expander input string; uses [$1, $2, ..] variables for groups", MetaValue = ICmd.MetaStreamable)]
@@ -56,32 +65,34 @@ internal class ExpandCmd : ICmd
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
 }
 
-[Verb("-S", HelpText = "Split input using RegExp and write results to output")]
+[Verb("split", false, new[] { "-S", "s" }, HelpText = "Split input using RegExp and write results to output")]
 internal class SplitCmd : ICmd
 {
     public string pattern { get; set; }
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
-}
+} // effectively grep using defaults
 
-// effectively grep using defaults
-[Verb("-C", HelpText = "Cut matches out and write results to output")]
+[Verb("cut", false, new[] { "-C", "c" }, HelpText = "Cut matches out and write results to output")]
 internal class CutCmd : ICmd
 {
     public string pattern { get; set; }
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
-
-    [Option('a', "invert", Required = false, Default = false, HelpText = "When set, instead of writing all occurrences of pattern; writes the remainder after cutting all occurrences")]
-    public bool invert { get; set; }
 }
