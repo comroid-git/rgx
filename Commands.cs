@@ -5,7 +5,7 @@ namespace rgx;
 
 internal interface ICmd
 {
-    [Value(0, Required = true, HelpText = "Pattern to use (in-shell PCRE syntax)", MetaName = "pattern")]
+    [Value(0, Required = true, HelpText = "Pattern to use (in-shell PCRE syntax)", MetaName = "<string> or <file>")]
     public string pattern { get; set; }
 
     [Option('f', "flags", Separator = ',', Required = false, HelpText = "Flags for the Pattern", MetaValue = "(see: dotnet RegexOptions)")]
