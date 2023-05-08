@@ -16,35 +16,11 @@ internal interface ICmd
 
     [Option('o', "output", Required = false, Default = null, HelpText = "An output target, uses stdout if unspecified", MetaValue = "<file>")]
     public string? output { get; set; }
-}
 
-[Verb("-M", true, new[] { "-R" }, HelpText = "Match or Replace input using RegExp and write results to output")]
-internal class MatchAndReplace : ICmd
-{
-    [Option('d', "default", Required = false, Default = null, HelpText = "Write the untreated input if it did not match")]
-    public bool useDefault { get; set; }
+    [Option('u', "unmatched", Required = false, Default = UnmatchedOutputMode.Skip, HelpText = "What to do with unmatched inputs during output (default: Skip)", MetaValue = "Prepend, Skip or Append")]
+    public UnmatchedOutputMode unmatched { get; set; }
 
-    [Value(1, Required = false, Default = null, MetaName = "replacement", HelpText = "Replacement input string", MetaValue = "<string> or <file>")]
-    public string? replacement { get; set; }
-
-    public string pattern { get; set; }
-    public IEnumerable<RegexOptions> flags { get; set; }
-    public string? input { get; set; }
-    public string? output { get; set; }
-}
-
-[Verb("-S", HelpText = "Split input using RegExp and write results to output")]
-internal class Split : ICmd
-{
-    public string pattern { get; set; }
-    public IEnumerable<RegexOptions> flags { get; set; }
-    public string? input { get; set; }
-    public string? output { get; set; }
-
-    [Option('m', "mode", Required = false, Default = OutputMode.Skip, HelpText = "What to do with unmatched inputs during output (default: Skip)", MetaValue = "Prepend, Skip or Append")]
-    public OutputMode mode { get; set; }
-
-    public enum OutputMode
+    public enum UnmatchedOutputMode
     {
         
         Skip = default,
@@ -58,6 +34,29 @@ internal class Split : ICmd
     }
 }
 
+[Verb("-M", true, new[] { "-R" }, HelpText = "Match or Replace input using RegExp and write results to output")]
+internal class MatchAndReplace : ICmd
+{
+    [Value(1, Required = false, Default = null, MetaName = "replacement", HelpText = "Replacement input string", MetaValue = "<string> or <file>")]
+    public string? replacement { get; set; }
+
+    public string pattern { get; set; }
+    public IEnumerable<RegexOptions> flags { get; set; }
+    public string? input { get; set; }
+    public string? output { get; set; }
+    public ICmd.UnmatchedOutputMode unmatched { get; set; }
+}
+
+[Verb("-S", HelpText = "Split input using RegExp and write results to output")]
+internal class Split : ICmd
+{
+    public string pattern { get; set; }
+    public IEnumerable<RegexOptions> flags { get; set; }
+    public string? input { get; set; }
+    public string? output { get; set; }
+    public ICmd.UnmatchedOutputMode unmatched { get; set; }
+}
+
 // effectively grep using defaults
 [Verb("-C", HelpText = "Cut matches out and write results to output")]
 internal class Cut : ICmd
@@ -66,6 +65,8 @@ internal class Cut : ICmd
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public ICmd.UnmatchedOutputMode unmatched { get; set; }
+
     [Option('m', "mode", Required = false, Default = OutputMode.Extract, HelpText = "What to print", MetaValue = "")]
     public OutputMode mode { get; set; }
     public enum OutputMode

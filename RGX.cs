@@ -47,10 +47,15 @@ public static class RGX
         var replacement = File.Exists(cmd.replacement) ? File.ReadAllText(cmd.replacement) : cmd.replacement;
 
         while (input.ReadLine() is { } line)
-            if (pattern.IsMatch(line))
-                output.WriteLine(replacement == null ? line : pattern.Replace(line, replacement));
-            else if (cmd.useDefault)
+        {
+            var isMatch = pattern.IsMatch(line);
+            if (!isMatch && cmd.unmatched == ICmd.UnmatchedOutputMode.Prepend)
                 output.WriteLine(line);
+            else if (isMatch)
+                output.WriteLine(replacement == null ? line : pattern.Replace(line, replacement));
+            else if (cmd.unmatched == ICmd.UnmatchedOutputMode.Append)
+                output.WriteLine(line);
+        }
 
         foreach (var res in new IDisposable[] { input, output })
             res.Dispose();
