@@ -20,22 +20,28 @@ public static class RGX
                 cfg.ParsingCulture = CultureInfo.InvariantCulture;
                 cfg.EnableDashDash = false;
                 cfg.MaximumDisplayWidth = Console.WindowWidth;
-            }).ParseArguments<MatchAndReplace, Split, Cut>(args)
-            .WithParsed(Run<MatchAndReplace>(Match))
-            .WithParsed(Run<Split>(Split))
-            .WithParsed(Run<Cut>(Cut))
+            }).ParseArguments<MatchCmd, ExpandCmd, SplitCmd, CutCmd>(args)
+            .WithParsed(Run<MatchCmd>(Match))
+            .WithParsed(Run<ExpandCmd>(Expand))
+            .WithParsed(Run<SplitCmd>(Split))
+            .WithParsed(Run<CutCmd>(Cut))
             .WithNotParsed(Error);
     }
 
     #region Command Methods
 
-    private static IEnumerable<string> Match(MatchAndReplace cmd, string line, Match match)
+    private static IEnumerable<string> Match(MatchCmd cmd, string line, Match match)
     {
-        var replacement = File.Exists(cmd.expander) ? File.ReadAllText(cmd.expander) : cmd.expander;
-        yield return replacement != null ? match.Result(replacement) : match.ToString();
+        yield return match.ToString();
     }
 
-    private static IEnumerable<string> Split(Split cmd, string line, Match match)
+    private static IEnumerable<string> Expand(ExpandCmd cmd, string line, Match match)
+    {
+        var replacement = File.Exists(cmd.expander) ? File.ReadAllText(cmd.expander) : cmd.expander;
+        yield return match.Result(replacement);
+    }
+
+    private static IEnumerable<string> Split(SplitCmd cmd, string line, Match match)
     {
         do
         {
@@ -43,7 +49,7 @@ public static class RGX
         } while ((match = match.NextMatch()) is { Success: true });
     }
 
-    private static IEnumerable<string> Cut(Cut cmd, string line, Match match)
+    private static IEnumerable<string> Cut(CutCmd cmd, string line, Match match)
     {
         if (cmd.invert)
             do
@@ -90,7 +96,7 @@ public static class RGX
                 : Console.Out);
     }
 
-    private static Action<C> Run<C>(Func<C, string, Match, IEnumerable<string>> handler) where C : ICmd
+    private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler) where CMD : ICmd
     {
         return cmd =>
         {
