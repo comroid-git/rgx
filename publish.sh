@@ -5,7 +5,7 @@ set -e # exit on error
 ./clean.sh
 
 # run tests first
-dotnet test -c Debug
+dotnet test -c Test
 
 # update SRCINFO
 makepkg --printsrcinfo > .SRCINFO
