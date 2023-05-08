@@ -12,10 +12,13 @@
         <InformationalVersion>$(AssemblyVersion)</InformationalVersion>
         <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>false</SelfContained>
-
-        <LibCommonPath>..\csapi\common\common.csproj</LibCommonPath>
-
+        <Configurations>Debug;Release;Test</Configurations>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <LibCommonPath>..\csapi\common\common.csproj</LibCommonPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,7 +27,11 @@
 
     <ItemGroup>
         <PackageReference Include="CommandLineParser" Version="2.9.1" />
-        <PackageReference Include="NUnit" Version="3.13.3" Condition="'$(Configuration)' == 'Debug'" />
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(Configuration)' == 'Test'">
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+        <PackageReference Include="NUnit" Version="3.13.3" />
     </ItemGroup>
 
 </Project>

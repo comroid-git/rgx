@@ -16,7 +16,13 @@ public static class RGX
         ILog.Detail = DetailLevel.None;
     }
     
-    public static void Main(params string[] args)
+    public static void
+#if TEST
+        Exec
+#else
+        Main
+#endif
+        (params string[] args)
     {
         new Parser(cfg =>
             {
@@ -28,7 +34,7 @@ public static class RGX
                 cfg.AutoVersion = true;
                 cfg.ParsingCulture = CultureInfo.InvariantCulture;
                 cfg.EnableDashDash = false;
-                cfg.MaximumDisplayWidth = Console.WindowWidth;
+                cfg.MaximumDisplayWidth = log.RunWithExceptionLogger(() => Console.WindowWidth, "Could not get Console Width", _=>1024,LogLevel.Debug);
             }).ParseArguments<MatchCmd, ExpandCmd, SplitCmd, CutCmd>(args)
             .WithParsed(Run<MatchCmd>(Match))
             .WithParsed(Run<ExpandCmd>(Expand))
@@ -52,10 +58,25 @@ public static class RGX
 
     private static IEnumerable<string> Split(SplitCmd cmd, string line, Match match)
     {
+        var matches = new List<Match>();
         do
         {
-            yield return match.ToString();
+            matches.Add(match);
         } while ((match = match.NextMatch()) is { Success: true });
+
+        var off = 0;
+        for (var i = 0; i < matches.Count; i++)
+        {
+            var each = matches[i];
+            var next = matches.Count>i+1?matches[i+1]:null;
+            if (next == null)
+                break;
+            var l = each.Index + each.Length;
+            var r = (next?.Index ?? each.Index) - l;
+            if (l + r > line.Length)
+                break;
+            yield return line.Substring(l, r);
+        }
     }
 
     private static IEnumerable<string> Cut(CutCmd cmd, string line, Match match)
