@@ -18,7 +18,7 @@ internal interface ICmd
     public string? output { get; set; }
 }
 
-[Verb("-M", true, new[] { "-R" }, HelpText = "Match or Replace input and write result to output")]
+[Verb("-M", true, new[] { "-R" }, HelpText = "Match or Replace input using RegExp and write results to output")]
 internal class MatchAndReplace : ICmd
 {
     [Option('d', "default", Required = false, Default = null, HelpText = "Write the untreated input if it did not match")]
@@ -33,7 +33,7 @@ internal class MatchAndReplace : ICmd
     public string? output { get; set; }
 }
 
-[Verb("-S", HelpText = "Split the input using a RegExp")]
+[Verb("-S", HelpText = "Split input using RegExp and write results to output")]
 internal class Split : ICmd
 {
     public string pattern { get; set; }
