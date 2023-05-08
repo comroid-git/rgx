@@ -64,7 +64,6 @@ public static class RGX
             matches.Add(match);
         } while ((match = match.NextMatch()) is { Success: true });
 
-        var off = 0;
         for (var i = 0; i < matches.Count; i++)
         {
             var each = matches[i];
