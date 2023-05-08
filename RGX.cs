@@ -42,10 +42,11 @@ public static class RGX
     private static void RunMatch(MatchAndReplace cmd)
     {
         var (pattern, input, output) = Prepare(cmd);
+        var replacement = File.Exists(cmd.replacement) ? File.ReadAllText(cmd.replacement) : cmd.replacement;
 
         while (input.ReadLine() is { } line)
             if (pattern.IsMatch(line))
-                output.WriteLine(cmd.replacement == null ? line : pattern.Replace(line, cmd.replacement));
+                output.WriteLine(replacement == null ? line : pattern.Replace(line, replacement));
             else if (cmd.useDefault)
                 output.WriteLine(line);
 

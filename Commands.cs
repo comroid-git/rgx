@@ -24,7 +24,7 @@ internal class MatchAndReplace : ICmd
     [Option('d', "default", Required = false, Default = null, HelpText = "Write the untreated input if it did not match")]
     public bool useDefault { get; set; }
 
-    [Value(1, Required = false, Default = null, MetaName = "replacement", HelpText = "Replacement ")]
+    [Value(1, Required = false, Default = null, MetaName = "replacement", HelpText = "Replacement input string", MetaValue = "<string> or <file>")]
     public string? replacement { get; set; }
 
     public string pattern { get; set; }
