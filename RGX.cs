@@ -110,43 +110,48 @@ public static class RGX
 
     #region Utility Methods
 
-    private static (Regex pattern, TextReader input, TextWriter output) Prepare(ICmd cmd)
-    {
-        if (cmd.flags.Contains(RegexOptions.Multiline))
-            Console.Error.WriteLine("Warning: The multiline flag is not supported since we're only ever parsing line by line");
-        return (new Regex(
-                Streamable.Get(cmd.pattern).AsString(),
-                cmd.flags.Aggregate((RegexOptions)0, (x, y) => x | y)),
-            Streamable.Get(cmd.input).AsReader(),
-            Streamable.Get(cmd.output).AsWriter());
-    }
-
     private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler, bool customInverse = false) where CMD : ICmd
     {
         return cmd =>
         {
-            var (pattern, input, output) = Prepare(cmd);
+            if (cmd.flags.Contains(RegexOptions.Multiline))
+                Console.Error.WriteLine("Warning: The multiline flag is not supported since we're only ever parsing line by line");
+            var regexOptions = cmd.flags.Aggregate((RegexOptions)0, (x, y) => x | y);
+            Regex BuildRegex(Streamable from) => new(from.AsString(), regexOptions);
+            var pattern = Streamable.Get(cmd.pattern).Use(BuildRegex).NonNull();
+            var input = Streamable.Get(cmd.input).OrStdIO().AsReader();
+            var output = Streamable.Get(cmd.output).OrStdIO().AsWriter();
+            var start = Streamable.Get(cmd.start).Use(BuildRegex);
+            var stop = Streamable.Get(cmd.stop).Use(BuildRegex);
+            bool started = start == null, stopped = false;
 
-            while (input.ReadLine() is { } line)
+            while (!stopped && input.ReadLine() is { } line)
             {
-                var match = pattern.Match(line);
-                var success = match.Success;
-                if (cmd.invert && !customInverse)
-                    success = !success;
-                
-                if (!success && cmd.unmatched == ICmd.IncludeMode.Prepend)
-                    output.WriteLine(line);
-                else if (success)
+                if (!started && start != null)
+                    started = start.IsMatch(line);
+                else if (stop != null)
+                    stopped = stop.IsMatch(line);
+                else
                 {
-                    if (cmd.untreated == ICmd.IncludeMode.Prepend)
+                    var match = pattern.Match(line);
+                    var success = match.Success;
+                    if (cmd.invert && !customInverse)
+                        success = !success;
+
+                    if (!success && cmd.unmatched == ICmd.IncludeMode.Prepend)
                         output.WriteLine(line);
-                    foreach (var str in handler(cmd, line, match))
-                        output.WriteLine(str);
-                    if (cmd.untreated == ICmd.IncludeMode.Append)
+                    else if (success)
+                    {
+                        if (cmd.untreated == ICmd.IncludeMode.Prepend)
+                            output.WriteLine(line);
+                        foreach (var str in handler(cmd, line, match))
+                            output.WriteLine(str);
+                        if (cmd.untreated == ICmd.IncludeMode.Append)
+                            output.WriteLine(line);
+                    }
+                    else if (cmd.unmatched == ICmd.IncludeMode.Append)
                         output.WriteLine(line);
                 }
-                else if (cmd.unmatched == ICmd.IncludeMode.Append)
-                    output.WriteLine(line);
             }
 
             foreach (var res in new IDisposable[] { input, output })

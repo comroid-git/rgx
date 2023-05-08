@@ -26,8 +26,14 @@ internal interface ICmd
     [Option('i', "input", Required = false, Default = null, HelpText = "An input source, uses stdin if unspecified", MetaValue = MetaStreamable)]
     public string? input { get; set; }
 
-    [Option('o', "output", Required = false, Default = null, HelpText = "An output target, uses stdout if unspecified", MetaValue = MetaFile)]
+    [Option('o', "output", Required = false, Default = null, HelpText = "An output target, uses stdout if unspecified", MetaValue = MetaStreamable)]
     public string? output { get; set; }
+
+    [Option('A', "start", Required = false, Default = null, HelpText = "A pattern that needs to match before the actual task may begin", MetaValue = MetaStreamable)]
+    public string? start { get; set; }
+
+    [Option('Z', "stop", Required = false, Default = null, HelpText = "A pattern that, when matches, exits the program", MetaValue = MetaStreamable)]
+    public string? stop { get; set; }
 
     [Option('M', "unmatched", Required = false, Default = IncludeMode.Skip, HelpText = "What to do with unmatched inputs during output (default: Skip)", MetaValue = MetaIncludeMode)]
     public IncludeMode unmatched { get; set; }
@@ -46,6 +52,8 @@ internal class MatchCmd : ICmd
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
     public bool invert { get; set; }
@@ -61,6 +69,8 @@ internal class ExpandCmd : ICmd
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
     public bool invert { get; set; }
@@ -73,6 +83,8 @@ internal class SplitCmd : ICmd
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
     public bool invert { get; set; }
@@ -85,6 +97,8 @@ internal class CutCmd : ICmd
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
     public bool invert { get; set; }
