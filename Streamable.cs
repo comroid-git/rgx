@@ -14,6 +14,7 @@ public abstract class Streamable
         this.desc = desc;
     }
 
+    //todo: public abstract Stream AsStream(object? arg = null);
     public abstract TextReader AsReader(object? arg = null);
     public abstract TextWriter AsWriter(object? arg = null);
 
