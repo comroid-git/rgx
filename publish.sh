@@ -9,7 +9,6 @@ dotnet test -c Test
 
 # update SRCINFO
 makepkg --printsrcinfo > .SRCINFO
-(git add .SRCINFO && git commit -m "SRCINFO" && git push) || true
 
 # build the executable
 makepkg -Cf --noconfirm
