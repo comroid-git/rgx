@@ -46,7 +46,7 @@ internal class MatchCmd : ICmd
     public ICmd.IncludeMode untreated { get; set; }
 }
 
-[Verb("-E", HelpText = "Expand input using RegExp and write results to output")]
+[Verb("expand", false, new[] { "-E", "e" }, HelpText = "Expand input using RegExp and write results to output")]
 internal class ExpandCmd : ICmd
 {
     [Value(1, Required = true, MetaName = "expander", HelpText = "Expander input string; uses [$1, $2, ..] variables for groups", MetaValue = ICmd.MetaStreamable)]
@@ -60,7 +60,7 @@ internal class ExpandCmd : ICmd
     public ICmd.IncludeMode untreated { get; set; }
 }
 
-[Verb("-S", HelpText = "Split input using RegExp and write results to output")]
+[Verb("split", false, new[] { "-S", "s" }, HelpText = "Split input using RegExp and write results to output")]
 internal class SplitCmd : ICmd
 {
     public string pattern { get; set; }
@@ -71,8 +71,7 @@ internal class SplitCmd : ICmd
     public ICmd.IncludeMode untreated { get; set; }
 }
 
-// effectively grep using defaults
-[Verb("-C", HelpText = "Cut matches out and write results to output")]
+[Verb("cut", false, new[] { "-C", "c" }, HelpText = "Cut matches out and write results to output")]
 internal class CutCmd : ICmd
 {
     public string pattern { get; set; }
