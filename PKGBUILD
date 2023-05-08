@@ -1,14 +1,14 @@
 # Maintainer: Tobias Burdow <kaleidox@comroid.org>
 
 pkgname=rgx-git
-pkgver=0.2
+pkgver=0.3
 pkgrel=1
 pkgdesc="CLI RegExp Tool"
 arch=('any')
 url="https://github.com/comroid-git/rgx"
 license=('MIT')
-depends=('dotnet-runtime-6.0')
-makedepends=('dotnet-sdk-6.0')
+depends=('dotnet-runtime-7.0')
+makedepends=('dotnet-sdk-7.0')
 source=("git+https://github.com/comroid-git/rgx.git")
 md5sums=('SKIP')
 options+=("!strip")
