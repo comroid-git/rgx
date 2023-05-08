@@ -39,7 +39,7 @@ public static class RGX
             .WithParsed(Run<MatchCmd>(Match))
             .WithParsed(Run<ExpandCmd>(Expand))
             .WithParsed(Run<SplitCmd>(Split))
-            .WithParsed(Run<CutCmd>(Cut, true))
+            .WithParsed(Run<CutCmd>(Cut))
             .WithNotParsed(Error);
     }
 
@@ -80,24 +80,16 @@ public static class RGX
 
     private static IEnumerable<string> Cut(CutCmd cmd, string line, Match match)
     {
-        if (cmd.invert)
-            do
-            {
-                yield return match.ToString();
-            } while ((match = match.NextMatch()) is { Success: true });
-        else
+        var matches = new List<Match>();
+        do
         {
-            var matches = new List<Match>();
-            do
-            {
-                matches.Add(match);
-            } while ((match = match.NextMatch()) is { Success: true });
+            matches.Add(match);
+        } while ((match = match.NextMatch()) is { Success: true });
 
-            var lastEnd = 0;
-            foreach (var each in matches)
-                line = line.Substring(lastEnd, lastEnd += each.Length);
-            yield return line;
-        }
+        var lastEnd = 0;
+        foreach (var each in matches)
+            line = line.Substring(lastEnd, lastEnd += each.Length);
+        yield return line;
     }
 
     private static void Error(IEnumerable<Error> errors)
@@ -110,7 +102,7 @@ public static class RGX
 
     #region Utility Methods
 
-    private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler, bool customInverse = false) where CMD : ICmd
+    private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler) where CMD : ICmd
     {
         return cmd =>
         {
@@ -135,8 +127,6 @@ public static class RGX
                 {
                     var match = pattern.Match(line);
                     var success = match.Success;
-                    if (cmd.invert && !customInverse)
-                        success = !success;
 
                     if (!success && cmd.unmatched == ICmd.IncludeMode.Prepend)
                         output.WriteLine(line);
