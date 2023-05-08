@@ -1,7 +1,7 @@
 # Maintainer: Tobias Burdow <kaleidox@comroid.org>
 
 pkgname=rgx-git
-pkgver=0.3
+pkgver=0.2
 pkgrel=2
 pkgdesc="CLI RegExp Tool"
 arch=('any')
