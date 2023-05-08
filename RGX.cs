@@ -2,11 +2,20 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using CommandLine;
+using comroid.common;
+using comroid.common.csapi;
 
 namespace rgx;
 
 public static class RGX
 {
+    private static readonly Log log = new(typeof(RGX));
+
+    static RGX()
+    {
+        ILog.Detail = DetailLevel.None;
+    }
+    
     public static void Main(params string[] args)
     {
         new Parser(cfg =>
@@ -74,12 +83,14 @@ public static class RGX
     private static void Error(IEnumerable<Error> errors)
     {
         foreach (var error in errors)
-            Debug.WriteLine(error);
+            log.At(LogLevel.Debug, error);
     }
 
     #endregion
 
     #region Utility Methods
+    
+    //private static Streamable? PrepareStreamable(string str) {}
 
     private static (Regex pattern, TextReader input, TextWriter output) Prepare(ICmd cmd)
     {
