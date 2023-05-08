@@ -40,4 +40,19 @@ internal class Split : ICmd
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
+
+    [Option('m', "mode", Required = false, Default = OutputMode.Join, HelpText = "What to do with the inputs during output", MetaValue = "Prepend, Join or Append")]
+    public OutputMode mode { get; set; }
+
+    public enum OutputMode
+    {
+        Prepend = 1,
+        P = 1,
+        
+        Join = 2,
+        J = 2,
+        
+        Append = 3,
+        A = 3
+    }
 }
