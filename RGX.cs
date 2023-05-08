@@ -20,11 +20,60 @@ public static class RGX
                 cfg.ParsingCulture = CultureInfo.InvariantCulture;
                 cfg.EnableDashDash = false;
                 cfg.MaximumDisplayWidth = Console.WindowWidth;
-            }).ParseArguments<MatchAndReplace, Split>(args)
-            .WithParsed<MatchAndReplace>(RunMatch)
-            .WithParsed<Split>(RunSplit)
+            }).ParseArguments<MatchAndReplace, Split, Cut>(args)
+            .WithParsed(Run<MatchAndReplace>(Match))
+            .WithParsed(Run<Split>(Split))
+            .WithParsed(Run<Cut>(Cut))
             .WithNotParsed(Error);
     }
+
+    #region Command Methods
+
+    private static IEnumerable<string> Match(MatchAndReplace cmd, string line, Match match)
+    {
+        var replacement = File.Exists(cmd.expander) ? File.ReadAllText(cmd.expander) : cmd.expander;
+        yield return replacement != null ? match.Result(replacement) : match.ToString();
+    }
+
+    private static IEnumerable<string> Split(Split cmd, string line, Match match)
+    {
+        do
+        {
+            yield return match.ToString();
+        } while ((match = match.NextMatch()) is { Success: true });
+    }
+
+    private static IEnumerable<string> Cut(Cut cmd, string line, Match match)
+    {
+        if (cmd.invert)
+            do
+            {
+                yield return match.ToString();
+            } while ((match = match.NextMatch()) is { Success: true });
+        else
+        {
+            var matches = new List<Match>();
+            do
+            {
+                matches.Add(match);
+            } while ((match = match.NextMatch()) is { Success: true });
+
+            var lastEnd = 0;
+            foreach (var each in matches)
+                line = line.Substring(lastEnd, lastEnd += each.Length);
+            yield return line;
+        }
+    }
+
+    private static void Error(IEnumerable<Error> errors)
+    {
+        foreach (var error in errors)
+            Debug.WriteLine(error);
+    }
+
+    #endregion
+
+    #region Utility Methods
 
     private static (Regex pattern, TextReader input, TextWriter output) Prepare(ICmd cmd)
     {
@@ -41,62 +90,35 @@ public static class RGX
                 : Console.Out);
     }
 
-    private static void RunMatch(MatchAndReplace cmd)
+    private static Action<C> Run<C>(Func<C, string, Match, IEnumerable<string>> handler) where C : ICmd
     {
-        var (pattern, input, output) = Prepare(cmd);
-        var replacement = File.Exists(cmd.replacement) ? File.ReadAllText(cmd.replacement) : cmd.replacement;
-
-        while (input.ReadLine() is { } line)
+        return cmd =>
         {
-            var isMatch = pattern.IsMatch(line);
-            if (!isMatch && cmd.unmatched == ICmd.UnmatchedOutputMode.Prepend)
-                output.WriteLine(line);
-            else if (isMatch)
-                output.WriteLine(replacement == null ? line : pattern.Replace(line, replacement));
-            else if (cmd.unmatched == ICmd.UnmatchedOutputMode.Append)
-                output.WriteLine(line);
-        }
+            var (pattern, input, output) = Prepare(cmd);
 
-        foreach (var res in new IDisposable[] { input, output })
-            res.Dispose();
-    }
-
-    private static void RunSplit(Split cmd)
-    {
-        // ReSharper disable once RedundantAssignment
-        var (pattern, input, output) = Prepare(cmd);
-
-        var newPattern = cmd.pattern;
-        if (newPattern.StartsWith('^'))
-            // do not match beginning of string
-            newPattern = newPattern.Substring(1);
-        if (!newPattern.EndsWith('$'))
-            newPattern += '$';
-        pattern = new Regex(newPattern);
-        int c;
-        var buf = new StringWriter();
-        while ((c = input.Read()) != -1)
-        {
-            buf.Write((char)c);
-            var str = buf.ToString();
-            if (pattern.Match(str) is not { Success: true } match)
+            while (input.ReadLine() is { } line)
             {
-                output.Write((char)c);
-                continue;
+                var match = pattern.Match(line);
+
+                if (!match.Success && cmd.unmatched == ICmd.IncludeMode.Prepend)
+                    output.WriteLine(line);
+                else if (match.Success)
+                {
+                    if (cmd.untreated == ICmd.IncludeMode.Prepend)
+                        output.WriteLine(line);
+                    foreach (var str in handler(cmd, line, match))
+                        output.WriteLine(str);
+                    if (cmd.untreated == ICmd.IncludeMode.Append)
+                        output.WriteLine(line);
+                }
+                else if (cmd.unmatched == ICmd.IncludeMode.Append)
+                    output.WriteLine(line);
             }
-            if (!string.IsNullOrWhiteSpace(str.Remove(match.Index, match.Length)))
-                output.WriteLine();
-            buf.Close();
-            buf = new StringWriter();
-        }
 
-        foreach (var res in new IDisposable[] { input, output })
-            res.Dispose();
+            foreach (var res in new IDisposable[] { input, output })
+                res.Dispose();
+        };
     }
 
-    private static void Error(IEnumerable<Error> errors)
-    {
-        foreach (var error in errors) 
-            Debug.WriteLine(error);
-    }
+    #endregion
 }
