@@ -68,7 +68,7 @@ internal class Cut : ICmd
     public ICmd.UnmatchedOutputMode unmatched { get; set; }
 
     [Option('m', "mode", Required = false, Default = OutputMode.Extract, HelpText = "What to print", MetaValue = "")]
-    public OutputMode mode { get; set; }
+    public OutputMode outputMode { get; set; }
     public enum OutputMode
     {
         Extract = default,
