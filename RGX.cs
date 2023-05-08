@@ -89,22 +89,16 @@ public static class RGX
     #endregion
 
     #region Utility Methods
-    
-    //private static Streamable? PrepareStreamable(string str) {}
 
     private static (Regex pattern, TextReader input, TextWriter output) Prepare(ICmd cmd)
     {
         if (cmd.flags.Contains(RegexOptions.Multiline))
             Console.Error.WriteLine("Warning: The multiline flag is not supported since we're only ever parsing line by line");
-        return (new Regex(File.Exists(cmd.pattern) ? File.ReadAllText(cmd.pattern) : cmd.pattern, (RegexOptions)cmd.flags.Aggregate(0, (x, y) => x | (int)y)),
-            cmd.input is not null and not ""
-                ? File.Exists(cmd.input)
-                    ? new StreamReader(new FileStream(cmd.input, FileMode.Open, FileAccess.Read))
-                    : new StringReader(cmd.input)
-                : Console.In,
-            cmd.output is not null and not "" && File.Exists(cmd.output)
-                ? new StreamWriter(new FileStream(cmd.output, FileMode.Truncate, FileAccess.Write))
-                : Console.Out);
+        return (new Regex(
+                Streamable.Get(cmd.pattern).AsString(),
+                cmd.flags.Aggregate((RegexOptions)0, (x, y) => x | y)),
+            Streamable.Get(cmd.input).AsReader(),
+            Streamable.Get(cmd.output).AsWriter());
     }
 
     private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler) where CMD : ICmd
