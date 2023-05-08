@@ -32,13 +32,15 @@ public abstract class Streamable
         UnmanagedMemoryStreamPattern.IsMatch(desc) ? new UnmanagedMemoryStreamable(desc) :
         new StringStreamable(desc);
     public Streamable OrStdIO() => this is EmptyStreamable ? StdIO : this;
-    public R? Use<R>(Func<Streamable, R?> by, Func<R?>? fallback = null)
+    public R? Use<R>(Func<Streamable, R?> by, Func<R?>? fallback = null) where R : class
     {
+        if (this is R r)
+            return r;
         if (this is EmptyStreamable)
             if (fallback != null)
                 return fallback();
-            else return by(this);
-        return (R?)(object?)null;
+            else return null;
+        return by(this);
     }
 
     public override string ToString() => desc;
