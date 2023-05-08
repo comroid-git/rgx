@@ -20,7 +20,7 @@ public static class RGX
                 cfg.ParsingCulture = CultureInfo.InvariantCulture;
                 cfg.EnableDashDash = false;
                 cfg.MaximumDisplayWidth = Console.WindowWidth;
-            }).ParseArguments<MatchAndReplace, Split, Group>(args)
+            }).ParseArguments<MatchAndReplace, Split>(args)
             .WithParsed<MatchAndReplace>(RunMatch)
             .WithParsed<Split>(RunSplit)
             .WithNotParsed(Error);
