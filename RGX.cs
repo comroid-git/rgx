@@ -47,7 +47,7 @@ public static class RGX
 
     private static IEnumerable<string> Match(MatchCmd cmd, string line, Match match)
     {
-        yield return match.ToString();
+        yield return line; //todo: highlight with colors when they are available 
     }
 
     private static IEnumerable<string> Expand(ExpandCmd cmd, string line, Match match)
