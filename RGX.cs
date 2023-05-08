@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using CommandLine;
 
@@ -27,7 +28,7 @@ public static class RGX
 
     private static (Regex pattern, TextReader input, TextWriter output) Prepare(ICmd cmd)
     {
-        return (new Regex(cmd.pattern, (RegexOptions)cmd.options.Aggregate(0, (x, y) => x | (int)y)),
+        return (new Regex(cmd.pattern, (RegexOptions)cmd.flags.Aggregate(0, (x, y) => x | (int)y)),
             cmd.input is not null and not ""
                 ? File.Exists(cmd.input)
                     ? new StreamReader(new FileStream(cmd.input, FileMode.Open, FileAccess.Read))
@@ -87,7 +88,7 @@ public static class RGX
 
     private static void Error(IEnumerable<Error> errors)
     {
-        foreach (var err in errors)
-            Console.Error.WriteLine(err);
+        foreach (var error in errors) 
+            Debug.WriteLine(error);
     }
 }

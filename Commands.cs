@@ -5,39 +5,39 @@ namespace rgx;
 
 internal interface ICmd
 {
-    [Value(0, MetaName = "pattern", Required = true)]
+    [Value(0, Required = true, HelpText = "Pattern to use (in-shell PCRE syntax)", MetaName = "pattern")]
     public string pattern { get; set; }
 
-    [Option('x', "options", Separator = ',', Required = false)]
-    public IEnumerable<RegexOptions> options { get; set; }
+    [Option('f', "flags", Separator = ',', Required = false, HelpText = "Flags for the Pattern", MetaValue = "(see: dotnet RegexOptions)")]
+    public IEnumerable<RegexOptions> flags { get; set; }
 
-    [Option('i', "input", Required = false, Default = null)]
+    [Option('i', "input", Required = false, Default = null, HelpText = "An input source, uses stdin if unspecified", MetaValue = "<string> or <file>")]
     public string? input { get; set; }
 
-    [Option('o', "output", Required = false, Default = null)]
+    [Option('o', "output", Required = false, Default = null, HelpText = "An output target, uses stdout if unspecified", MetaValue = "<file>")]
     public string? output { get; set; }
 }
 
-[Verb("-M", true, new[] { "-R" })]
+[Verb("-M", true, new[] { "-R" }, HelpText = "Match or Replace input and write result to output")]
 internal class MatchAndReplace : ICmd
 {
-    [Option('d', "default", Required = false, Default = null)]
+    [Option('d', "default", Required = false, Default = null, HelpText = "Write the untreated input if it did not match")]
     public bool useDefault { get; set; }
 
-    [Value(1, MetaName = "replacement", Required = false, Default = null)]
+    [Value(1, Required = false, Default = null, MetaName = "replacement", HelpText = "Replacement ")]
     public string? replacement { get; set; }
 
     public string pattern { get; set; }
-    public IEnumerable<RegexOptions> options { get; set; }
+    public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
 }
 
-[Verb("-S")]
+[Verb("-S", HelpText = "Split the input using a RegExp")]
 internal class Split : ICmd
 {
     public string pattern { get; set; }
-    public IEnumerable<RegexOptions> options { get; set; }
+    public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
 }
