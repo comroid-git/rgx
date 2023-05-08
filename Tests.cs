@@ -6,6 +6,13 @@ namespace rgx;
 
 public class Tests
 {
+    public enum RunType
+    {
+        Match,
+        Replace,
+        Split
+    }
+
     public static string[] Run(RunType type, [StringSyntax(StringSyntaxAttribute.Regex)] string pattern, params string[] input)
     {
         var @in = new StringReader(string.Join("\n", input));
@@ -48,7 +55,7 @@ public class Tests
 9 Sockets in /run/screens/S-kaleidox.";
         var result = Run(RunType.Match, @"\s*(\d+)\.(yourprocess)\s+\((\w+)\)", input);
 
-        
+
         Assert.That(result.Length, Is.EqualTo(1));
         Assert.That(result[0], Is.EqualTo(input.Split("\r?\n")));
     }
@@ -58,13 +65,6 @@ public class Tests
         var result = Run(RunType.Split, @"[\[\"",\s\]]+", @"[ 0,1, 2 ,3, 4] ");
         for (var i = 0; i < result.Length; i++)
             Assert.That(int.Parse(result[i]), Is.EqualTo(i));
-    }
-
-    public enum RunType
-    {
-        Match,
-        Replace,
-        Split
     }
 }
 #endif

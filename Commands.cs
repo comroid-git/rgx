@@ -5,6 +5,13 @@ namespace rgx;
 
 internal interface ICmd
 {
+    public enum IncludeMode
+    {
+        Skip = default,
+        Prepend = 1,
+        Append = 2
+    }
+
     public const string MetaFile = "<file>";
     public const string MetaStreamable = "<string> or <file>";
     public const string MetaRegexOpts = "(see: .NET RegexOptions)";
@@ -24,18 +31,12 @@ internal interface ICmd
 
     [Option('M', "unmatched", Required = false, Default = IncludeMode.Skip, HelpText = "What to do with unmatched inputs during output (default: Skip)", MetaValue = MetaIncludeMode)]
     public IncludeMode unmatched { get; set; }
+
     [Option('T', "untreated", Required = false, Default = IncludeMode.Skip, HelpText = "What to do with untreated but matched inputs during output (default: Skip)", MetaValue = MetaIncludeMode)]
     public IncludeMode untreated { get; set; }
-
-    public enum IncludeMode
-    {
-        Skip = default,
-        Prepend = 1,
-        Append = 2
-    }
 }
 
-[Verb("-M", true, HelpText = "Match or Replace input using RegExp and write results to output")]
+[Verb("match", true, new[] { "-M", "m" }, HelpText = "Match or Replace input using RegExp and write results to output")]
 internal class MatchCmd : ICmd
 {
     public string pattern { get; set; }
@@ -69,18 +70,18 @@ internal class SplitCmd : ICmd
     public string? output { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
-}
+} // effectively grep using defaults
 
 [Verb("cut", false, new[] { "-C", "c" }, HelpText = "Cut matches out and write results to output")]
 internal class CutCmd : ICmd
 {
+    [Option('a', "invert", Required = false, Default = false, HelpText = "When set, instead of writing all occurrences of pattern; writes the remainder after cutting all occurrences")]
+    public bool invert { get; set; }
+
     public string pattern { get; set; }
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }
     public string? output { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
-
-    [Option('a', "invert", Required = false, Default = false, HelpText = "When set, instead of writing all occurrences of pattern; writes the remainder after cutting all occurrences")]
-    public bool invert { get; set; }
 }
