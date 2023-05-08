@@ -7,7 +7,7 @@ namespace rgx;
 
 public static class RGX
 {
-    public static void Main(string[] args)
+    public static void Main(params string[] args)
     {
         new Parser(cfg =>
             {
