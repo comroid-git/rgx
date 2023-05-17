@@ -129,26 +129,30 @@ public static class RGX
             {
                 if (!started && start != null)
                     started = start.IsMatch(line);
-                else if (stop != null)
+                else if (started && stop != null)
                     stopped = stop.IsMatch(line);
                 else
                 {
                     var match = pattern.Match(line);
                     var success = match.Success;
 
-                    if (!success && cmd.unmatched == ICmd.IncludeMode.Prepend)
-                        output.WriteLine(line);
-                    else if (success)
+                    do
                     {
-                        if (cmd.untreated == ICmd.IncludeMode.Prepend)
+                        if (!success && cmd.unmatched == ICmd.IncludeMode.Prepend)
                             output.WriteLine(line);
-                        foreach (var str in handler(cmd, line, match))
-                            output.WriteLine(str);
-                        if (cmd.untreated == ICmd.IncludeMode.Append)
+                        else if (success)
+                        {
+                            if (cmd.untreated == ICmd.IncludeMode.Prepend)
+                                output.WriteLine(line);
+                            foreach (var str in handler(cmd, line, match!))
+                                output.WriteLine(str);
+                            if (cmd.untreated == ICmd.IncludeMode.Append)
+                                output.WriteLine(line);
+                        }
+                        else if (cmd.unmatched == ICmd.IncludeMode.Append)
                             output.WriteLine(line);
-                    }
-                    else if (cmd.unmatched == ICmd.IncludeMode.Append)
-                        output.WriteLine(line);
+                        match = match?.NextMatch();
+                    } while (success = match?.Success ?? false);
                 }
             }
 
