@@ -95,3 +95,16 @@ internal class CutCmd : ICmd
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
 }
+
+[Verb("groups", false, new[] { "g" }, HelpText = "Print groups of Match")]
+internal class GroupsCmd : ICmd
+{
+    public string pattern { get; set; }
+    public IEnumerable<RegexOptions> flags { get; set; }
+    public string? input { get; set; }
+    public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
+    public ICmd.IncludeMode unmatched { get; set; }
+    public ICmd.IncludeMode untreated { get; set; }
+}

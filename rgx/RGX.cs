@@ -35,11 +35,12 @@ public static class RGX
                 cfg.ParsingCulture = CultureInfo.InvariantCulture;
                 cfg.EnableDashDash = false;
                 cfg.MaximumDisplayWidth = log.RunWithExceptionLogger(() => Console.WindowWidth, "Could not get Console Width", _=>1024,LogLevel.Debug);
-            }).ParseArguments<MatchCmd, ExpandCmd, SplitCmd, CutCmd>(args)
+            }).ParseArguments<MatchCmd, ExpandCmd, SplitCmd, CutCmd, GroupsCmd>(args)
             .WithParsed(Run<MatchCmd>(Match))
             .WithParsed(Run<ExpandCmd>(Expand))
             .WithParsed(Run<SplitCmd>(Split))
             .WithParsed(Run<CutCmd>(Cut))
+            .WithParsed(Run<GroupsCmd>(Groups))
             .WithNotParsed(Error);
     }
 
@@ -90,6 +91,13 @@ public static class RGX
         foreach (var each in matches)
             line = line.Substring(lastEnd, lastEnd += each.Length);
         yield return line;
+    }
+
+    private static IEnumerable<string> Groups(GroupsCmd cmd, string line, Match match)
+    {
+        var groups = match.Groups;
+        foreach (var key in groups.Keys)
+            yield return $"{key}: {groups[key]}";
     }
 
     private static void Error(IEnumerable<Error> errors)
