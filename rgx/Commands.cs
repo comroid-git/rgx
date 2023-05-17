@@ -12,7 +12,6 @@ internal interface ICmd
         Append = 2
     }
 
-    public const string MetaFile = "<file>";
     public const string MetaStreamable = "<string> or <file>";
     public const string MetaRegexOpts = "(see: .NET RegexOptions)";
     public const string MetaIncludeMode = "skip, prepend or append";
@@ -82,7 +81,7 @@ internal class SplitCmd : ICmd
     public string? stop { get; set; }
     public ICmd.IncludeMode unmatched { get; set; }
     public ICmd.IncludeMode untreated { get; set; }
-} // effectively grep using defaults
+}
 
 [Verb("cut", false, new[] { "c" }, HelpText = "Cut matches out and write results to output")]
 internal class CutCmd : ICmd
