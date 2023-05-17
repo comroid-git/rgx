@@ -38,8 +38,8 @@ public static class RGX
             }).ParseArguments<MatchCmd, ExpandCmd, SplitCmd, CutCmd, GroupsCmd>(args)
             .WithParsed(Run<MatchCmd>(Match))
             .WithParsed(Run<ExpandCmd>(Expand))
-            .WithParsed(Run<SplitCmd>(Split))
-            .WithParsed(Run<CutCmd>(Cut))
+            .WithParsed(Run<SplitCmd>(Split, false))
+            .WithParsed(Run<CutCmd>(Cut, false))
             .WithParsed(Run<GroupsCmd>(Groups))
             .WithNotParsed(Error);
     }
@@ -110,7 +110,7 @@ public static class RGX
 
     #region Utility Methods
 
-    private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler) where CMD : ICmd
+    private static Action<CMD> Run<CMD>(Func<CMD, string, Match, IEnumerable<string>> handler, bool auto = true) where CMD : ICmd
     {
         return cmd =>
         {
@@ -152,7 +152,7 @@ public static class RGX
                         else if (cmd.unmatched == ICmd.IncludeMode.Append)
                             output.WriteLine(line);
                         match = match?.NextMatch();
-                    } while (success = match?.Success ?? false);
+                    } while (auto && (success = match?.Success ?? false));
                 }
             }
 
