@@ -22,16 +22,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="comroid.csapi.common" Version="0.1.0" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="CommandLineParser" Version="2.9.1" />
     </ItemGroup>
-    
-    <ItemGroup Condition="'$(Configuration)' == 'Test'">
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-        <PackageReference Include="NUnit" Version="3.13.3" />
+
+    <ItemGroup Condition="Exists('..\..\csapi\common\common.csproj')">
+        <ProjectReference Include="..\..\csapi\common\common.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="!Exists('..\..\csapi\common\common.csproj')">
+        <PackageReference Include="comroid.csapi.common" Version="0.1.0"/>
     </ItemGroup>
 
 </Project>
