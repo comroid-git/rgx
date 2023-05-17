@@ -1,9 +1,8 @@
-﻿#if TEST
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 
-namespace rgx;
+namespace rgx.test;
 
 public static class Tests
 {
@@ -34,7 +33,7 @@ public static class Tests
             Console.SetIn(input);
             Console.SetOut(output);
 
-            RGX.Exec(type.ToString(), pattern);
+            RGX.Main(type.ToString(), pattern);
         }
         finally
         {
@@ -70,4 +69,3 @@ public static class Tests
             Assert.That(int.Parse(result[i]), Is.EqualTo(i));
     }
 }
-#endif
