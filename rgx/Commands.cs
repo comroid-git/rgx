@@ -15,6 +15,7 @@ internal interface ICmd
     public const string MetaStreamable = "<string> or <file>";
     public const string MetaRegexOpts = "(see: .NET RegexOptions)";
     public const string MetaIncludeMode = "skip, prepend or append";
+    public const string MetaAmount = "any number greater than 0";
 
     [Value(0, Required = true, HelpText = "Pattern to use (in-shell PCRE syntax)", MetaName = MetaStreamable)]
     public string pattern { get; set; }
@@ -99,6 +100,22 @@ internal class CutCmd : ICmd
 [Verb("groups", false, new[] { "g" }, HelpText = "Print groups of Match")]
 internal class GroupsCmd : ICmd
 {
+    public string pattern { get; set; }
+    public IEnumerable<RegexOptions> flags { get; set; }
+    public string? input { get; set; }
+    public string? output { get; set; }
+    public string? start { get; set; }
+    public string? stop { get; set; }
+    public ICmd.IncludeMode unmatched { get; set; }
+    public ICmd.IncludeMode untreated { get; set; }
+}
+
+[Verb("reverse", false, new[] { "r" }, HelpText = "Prints a random string that matches the pattern")]
+internal class ReverseCmd : ICmd
+{
+    [Option('n', "amount", Required = false, Default = 1, HelpText = "How many strings to print", MetaValue = ICmd.MetaAmount)]
+    public int? amount { get; set; }
+    
     public string pattern { get; set; }
     public IEnumerable<RegexOptions> flags { get; set; }
     public string? input { get; set; }

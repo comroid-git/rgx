@@ -1,9 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using CommandLine;
 using comroid.common;
 using comroid.common.csapi;
+using rgx.antlr;
+using Parser = CommandLine.Parser;
 
 namespace rgx;
 
@@ -35,12 +39,13 @@ public static class RGX
                 cfg.ParsingCulture = CultureInfo.InvariantCulture;
                 cfg.EnableDashDash = false;
                 cfg.MaximumDisplayWidth = log.RunWithExceptionLogger(() => Console.WindowWidth, "Could not get Console Width", _=>1024,LogLevel.Debug);
-            }).ParseArguments<MatchCmd, ExpandCmd, SplitCmd, CutCmd, GroupsCmd>(args)
+            }).ParseArguments<MatchCmd, ExpandCmd, SplitCmd, CutCmd, GroupsCmd, ReverseCmd>(args)
             .WithParsed(Run<MatchCmd>(Match))
             .WithParsed(Run<ExpandCmd>(Expand))
             .WithParsed(Run<SplitCmd>(Split, false))
             .WithParsed(Run<CutCmd>(Cut, false))
             .WithParsed(Run<GroupsCmd>(Groups))
+            .WithParsed<ReverseCmd>(Reverse)
             .WithNotParsed(Error);
     }
 
@@ -98,6 +103,22 @@ public static class RGX
         var groups = match.Groups;
         foreach (var key in groups.Keys)
             yield return $"{key}: {groups[key]}";
+    }
+
+    private static void Reverse(ReverseCmd cmd)
+    {
+        foreach (var _ in Enumerable.Range(0, cmd.amount!.Value))
+        {
+            var pattern = Streamable.Get(cmd.pattern).AsString();
+            var stream = new AntlrInputStream(pattern);
+            var lexer = new RegExpLexer(stream);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new RegExpParser(tokens) { ErrorHandler = new BailErrorStrategy() };
+            var reverser = new RegExpReverser();
+            var atom = parser.atom();
+            var result = reverser.Visit(atom);
+            Console.WriteLine(result);
+        }
     }
 
     private static void Error(IEnumerable<Error> errors)
@@ -162,4 +183,8 @@ public static class RGX
     }
 
     #endregion
+}
+
+internal class RegExpReverser : IParseTreeListener
+{
 }
